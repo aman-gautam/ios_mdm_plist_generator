@@ -46,22 +46,28 @@ import org.apache.commons.codec.binary.Base64;;
  */
 
 public class Test {
+	/*
+	 * Configure the following.
+	 */
+	private static final String ALIAS = "MY_ALIAS";
+	private static final String PASSWORD = "MY_PASSWORD";
+	
+	
+	private static final String VENDOR_P12 = "vendor.p12";
+	private static final String CUSTOMER_DER = "customer.der";
+	private static final String MDM_PEM = "mdm.pem";
+	private static final String INTERMEDIATE_PEM = "intermediate.pem";
+	private static final String ROOT_PEM = "root.pem";
 
     public static void main(String[] args) throws Exception {
 
         URL dirUrl = Test.class.getResource(".");
-        URL keyUrl = new URL(dirUrl, "vendor.p12");
+        URL keyUrl = new URL(dirUrl, VENDOR_P12);
         String keyPath = keyUrl.getPath().replaceAll("%20", " ");
-        System.out.println(keyPath);
-
-//        BASE64Encoder b64en = new BASE64Encoder();
-//        Base64.encode
 
         Test test = new Test();
         PrivateKey privateKey = test.extractPrivateKey(keyPath);
-        System.out.print("dir url= "+ dirUrl);
-        URL csrUrl = new URL(dirUrl, "customer.der");
-        System.out.println("csr url = "+csrUrl);
+        URL csrUrl = new URL(dirUrl, CUSTOMER_DER);
         
         String csrPath = csrUrl.getPath().replace("%20", " ");
         byte[] csrBytes = test.readCSR(csrPath);
@@ -71,14 +77,14 @@ public class Test {
 //        String signature = b64en.encode(sigBytes);
         String signature = Base64.encodeBase64String(sigBytes);
 
-        URL mdmUrl = new URL(dirUrl, "mdm.pem");
+        URL mdmUrl = new URL(dirUrl, MDM_PEM);
         String mdmPath = mdmUrl.getPath().replace("%20", " ");
         String mdm = test.readCertChain(mdmPath);
 
-        URL intermediateUrl = new URL(dirUrl, "intermediate.pem");
+        URL intermediateUrl = new URL(dirUrl, INTERMEDIATE_PEM);
         String intermediatePath = intermediateUrl.getPath().replace("%20", " ");
         String intermediate = test.readCertChain(intermediatePath);
-        URL rootUrl = new URL(dirUrl, "root.pem");
+        URL rootUrl = new URL(dirUrl, ROOT_PEM);
         String rootPath = rootUrl.getPath().replace("%20", " ");
         String root = test.readCertChain(rootPath);
         StringBuffer sb = new StringBuffer();
@@ -104,8 +110,8 @@ public class Test {
     		throws KeyStoreException, NoSuchAlgorithmException, CertificateException,
     			FileNotFoundException, IOException, UnrecoverableKeyException{
 
-    	String alias = "abhi test";//Change to your alias
-        String password = "mahadev";//Change to your password
+    	String alias = ALIAS;//Change to your alias
+        String password = PASSWORD ;//Change to your password
         KeyStore caKs = KeyStore.getInstance("PKCS12");
         caKs.load(new FileInputStream(new File(path2keystore)), password.toCharArray());
         Key key = caKs.getKey(alias, password.toCharArray());
